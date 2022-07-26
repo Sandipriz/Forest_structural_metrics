@@ -19,7 +19,9 @@ data3$Year <- data3$Years-2011
 data3$N_treatment=ifelse(data3$Treatment %in% c("NP","N"), "With_N","Without_N") 
 data3$P_treatment=ifelse(data3$Treatment %in% c("NP","P"), "With_P","Without_P")
 
+
 head(data3)
+
 data3$Stand <- as.factor(data3$Stand)
 data3$N_treatment <- as.factor(data3$N_treatment)
 data3$P_treatment <- as.factor(data3$P_treatment)

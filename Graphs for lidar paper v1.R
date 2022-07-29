@@ -50,7 +50,7 @@ rump$Treatment<-factor(rump$Treatment, levels=c("Control","N","P","N+P"))
 
 f1<-ggplot(rump, aes(x=Treatment, y=emmean, fill=Treatment))+geom_bar(stat="identity", col="black")+
   scale_fill_manual(values=c("black","blue","red","purple"))+theme_classic()+
-  geom_errorbar(aes(ymin=lower.CL, ymax=upper.CL), width=0.3)+ylab("Rumple (%)")
+  geom_errorbar(aes(ymin=emmean-SE, ymax=emmean+SE), width=0.3)+ylab("Rumple (%)")
 
 
 ######
@@ -67,7 +67,7 @@ mmch$Treatment<-factor(mmch$Treatment, levels=c("Control","N","P","N+P"))
 
 f2<-ggplot(mmch, aes(x=Treatment, y=emmean, fill=Treatment))+geom_bar(stat="identity", col="black")+
   scale_fill_manual(values=c("black","blue","red","purple"))+theme_classic()+
-  geom_errorbar(aes(ymin=lower.CL, ymax=upper.CL), width=0.3)+ylab("Mean max canopy height (m)")
+  geom_errorbar(aes(ymin=emmean-SE, ymax=emmean+SE), width=0.3)+ylab("Mean max canopy height (m)")
 
 library(ggpubr)
 ggarrange(f1, f2, common.legend=T, legend="bottom")

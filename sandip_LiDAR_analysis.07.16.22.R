@@ -4,6 +4,7 @@ library(tidyr)
 library(nlme)
 library(lmerTest)
 library(readxl)
+library(emmeans)
 
 data3<- read_excel("BEF_forest_structure_data.xlsx")
 data3<-as.data.frame(data3)
@@ -43,14 +44,13 @@ names(data3)
 # we want to loop through the dependent variables. These are columns 6:18
 names(data3)
 
-#make an empty 'list' to hold the output
 
-output.mixed<-list()
 
 # essentially, you are going through each column 6:18 and generating this output
-library(emmeans)
-m1 <- ( lme( mean.max.canopy.ht.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
-anova(m1)
+
+
+m1 <- anova(( lme( mean.max.canopy.ht.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3)))
+m1
 a1 <- emmeans(m1, pairwise ~ N_treatment+P_treatment)
 a1
 n1 <- ( lme( entropy.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
@@ -59,7 +59,8 @@ b1
 o1 <- ( lme( rumple.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
 c1 <- emmeans(o1, pairwise ~ N_treatment+P_treatment)
 c1
-p1 <- ( lme( sd.sd.aop.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
+p1 <- ( lme( sd.sd.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
+
 d1 <- emmeans(p1, pairwise ~ N_treatment+P_treatment)
 d1
 q1 <- ( lme(VAI.AOP.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
@@ -69,12 +70,24 @@ r1 <- ( lme(VCI.AOP.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, dat
 g1 <- emmeans(r1, pairwise ~ N_treatment+P_treatment)
 g1
 
-for(i in c(6:18)){ 
+
+rbind(m1,n1,o1, p1, q1, r1)
+
+
+names(data3) # start the list of columns where the dependent variables start
+#make an empty 'list' to hold the output
+
+output.mixed<-list()
+
+
+for(i in c(8:21)){ 
   y = data3[,i]
   Stand= data3$Stand
   N_treatment=data3$N_treatment
   P_treatment=data3$P_treatment
-  output.mixed[[i-5]] <- aov.mixed(y, Stand, N_treatment, P_treatment, Year, Age)}
+  output.mixed[[i-7]] <- aov.mixed(y, Stand, N_treatment, P_treatment, Year, Age)}
+
+
 
 
 output.mixed

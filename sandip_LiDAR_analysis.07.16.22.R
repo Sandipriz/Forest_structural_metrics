@@ -5,43 +5,49 @@ library(nlme)
 library(lmerTest)
 library(readxl)
 
-data3<- read_excel("BEF_forest_structure_data.xlsx")
-data3<-as.data.frame(data3)
+lid<- read_excel("BEF_forest_structure_data.xlsx")
+lid<-as.data.frame(lid)
 ##read in data
-head(data3)
-names(data3)
+head(lid)
+names(lid)
 
 # turn years into 'year' for year since treatment
-data3$Year <- data3$Years-2011
+lid$Year <- lid$Years-2011
+lid$Year <- as.factor(lid$Year)
+
 
 ## N addition and P addition
 ##generating new columns depending on treatment (N vs No_N) (P vs No_P)
-data3$N_treatment=ifelse(data3$Treatment %in% c("NP","N"), "With_N","Without_N") 
-data3$P_treatment=ifelse(data3$Treatment %in% c("NP","P"), "With_P","Without_P")
+lid$N_treatment=ifelse(lid$Treatment %in% c("NP","N"), "With_N","Without_N") 
+lid$P_treatment=ifelse(lid$Treatment %in% c("NP","P"), "With_P","Without_P")
 
 
-head(data3)
+head(lid)
 
-data3$Stand <- as.factor(data3$Stand)
-data3$N_treatment <- as.factor(data3$N_treatment)
-data3$P_treatment <- as.factor(data3$P_treatment)
+lid$Stand <- as.factor(lid$Stand)
+lid$N_treatment <- as.factor(lid$N_treatment)
+lid$P_treatment <- as.factor(lid$P_treatment)
 
-data3$N_treatment <- factor(data3$N_treatment,
+lid$N_treatment <- factor(lid$N_treatment,
                             levels= c("Without_N", "With_N"))
 
-data3$P_treatment <- factor(data3$P_treatment,
+lid$P_treatment <- factor(lid$P_treatment,
                             levels= c("Without_P", "With_P"))
+
+lid$Age <- factor(lid$Age,
+                  levels=c("~30 years old", "~60 years old", "~100 years old"),
+                  labels= c("young", "medium", "mature"))
 
 ## Specify a function that specifies the mixed effect model you'd like to use for each canopy metric
 ## this gets the coefficients for the fixed effects
 aov.mixed <- function(y, Stand, N_treatment, P_treatment, Year, Age){
   #1 aov for linear mixed effect model
-  mixed1<-anova( lme(y ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
+  mixed1<-anova( lme(y ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=lid))
   return(mixed1)}
 
-names(data3)
+names(lid)
 # we want to loop through the dependent variables. These are columns 6:18
-names(data3)
+names(lid)
 
 #make an empty 'list' to hold the output
 
@@ -49,31 +55,35 @@ output.mixed<-list()
 
 # essentially, you are going through each column 6:18 and generating this output
 library(emmeans)
-m1 <- ( lme( mean.max.canopy.ht.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
+m1 <- ( lme( mean.max.canopy.ht.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=lid))
 anova(m1)
 a1 <- emmeans(m1, pairwise ~ N_treatment+P_treatment)
+a11 <- emmeans(m1, pairwise ~ Age+Year)
 a1
-n1 <- ( lme( entropy.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
+a11
+n1 <- ( lme( entropy.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=lid))
 b1 <- emmeans(n1, pairwise ~ N_treatment+P_treatment)
+b11 <- emmeans(n1, pairwise ~ Age)
 b1
-o1 <- ( lme( rumple.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
+b11
+o1 <- ( lme( rumple.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=lid))
 c1 <- emmeans(o1, pairwise ~ N_treatment+P_treatment)
 c1
-p1 <- ( lme( sd.sd.aop.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
+p1 <- ( lme( sd.sd.aop.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=lid))
 d1 <- emmeans(p1, pairwise ~ N_treatment+P_treatment)
 d1
-q1 <- ( lme(VAI.AOP.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
+q1 <- ( lme(VAI.AOP.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=lid))
 e1 <- emmeans(q1, pairwise ~ N_treatment+P_treatment)
 e1
-r1 <- ( lme(VCI.AOP.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
+r1 <- ( lme(VCI.AOP.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=lid))
 g1 <- emmeans(r1, pairwise ~ N_treatment+P_treatment)
 g1
 
 for(i in c(6:18)){ 
-  y = data3[,i]
-  Stand= data3$Stand
-  N_treatment=data3$N_treatment
-  P_treatment=data3$P_treatment
+  y = lid[,i]
+  Stand= lid$Stand
+  N_treatment=lid$N_treatment
+  P_treatment=lid$P_treatment
   output.mixed[[i-5]] <- aov.mixed(y, Stand, N_treatment, P_treatment, Year, Age)}
 
 
@@ -88,9 +98,9 @@ dim(d.int)
 d.int
 
 # this adds in row names to d.int
-rep(names(data3)[c(6:18)], each=6)
+rep(names(lid)[c(6:18)], each=6)
 # lets add these rows into d.int, the dataframe of model outputs (p values and df)
-d.int$variable<-rep(names(data3)[c(6:18)], each=6)
+d.int$variable<-rep(names(lid)[c(6:18)], each=6)
 names(d.int)
 
 names(d.int)
@@ -119,21 +129,21 @@ write.csv(fp.print, file="p_values_structural_metrics_6_25.csv")
 
 library(ggplot2)
 
-data3$Age <- factor(data3$Age,
+lid$Age <- factor(lid$Age,
                     levels=c("~30 years old", "~60 years old", "~100 years old"),
                     labels= c("young", "medium", "mature"))
 
-data3$staplo<-paste(data3$Stand, data3$Treatment)
-ggplot(data3, aes(x=Years, y=mean.max.canopy.ht.aop, col=Treatment,group=staplo))+geom_point()+
+lid$staplo<-paste(lid$Stand, lid$Treatment)
+ggplot(lid, aes(x=Years, y=mean.max.canopy.ht.aop, col=Treatment,group=staplo))+geom_point()+
   facet_wrap(~Age)+scale_color_manual(values=c(Control="black",N="blue", P="red",NP="purple"))+
     geom_smooth(method="lm",aes(col=Treatment))
 
-data3$statP<-paste(data3$Years, data3$Stand, data3$P_treatment)
-data3$statN<-paste(data3$Years, data3$Stand, data3$N_treatment)
-data3$N_treatment<-factor(data3$N_treatment, levels=c("Without_N","With_N"))
+lid$statP<-paste(lid$Years, lid$Stand, lid$P_treatment)
+lid$statN<-paste(lid$Years, lid$Stand, lid$N_treatment)
+lid$N_treatment<-factor(lid$N_treatment, levels=c("Without_N","With_N"))
 
 
-ggplot(data3, aes(x=N_treatment, y=mean.max.canopy.ht.aop, col=Treatment,group=statP))+
+ggplot(lid, aes(x=N_treatment, y=mean.max.canopy.ht.aop, col=Treatment,group=statP))+
   geom_point(size=2)+geom_line()+
   facet_wrap(~Age)+
   scale_shape_manual(values = c(0, 1, 2,8))+
@@ -145,7 +155,7 @@ ggplot(data3, aes(x=N_treatment, y=mean.max.canopy.ht.aop, col=Treatment,group=s
 
 
 ##For Nitrogen Only
-ggplot(data3, aes(x=N_treatment, y=mean.max.canopy.ht.aop,group=statP))+
+ggplot(lid, aes(x=N_treatment, y=mean.max.canopy.ht.aop,group=statP))+
   geom_point(aes(shape=Treatment, color=Treatment, size=2))+
   scale_shape_manual(values=c(15, 16, 17,18))+
   geom_line()+
@@ -157,7 +167,7 @@ ggplot(data3, aes(x=N_treatment, y=mean.max.canopy.ht.aop,group=statP))+
 
 
 ##For Phosphorus only
-ggplot(data3, aes(x=P_treatment, y=mean.max.canopy.ht.aop,group=statN))+
+ggplot(lid, aes(x=P_treatment, y=mean.max.canopy.ht.aop,group=statN))+
   geom_point(aes(shape=Treatment, color=Treatment, size=2))+
   scale_shape_manual(values=c(15, 16, 17,18))+
   geom_line()+
@@ -168,7 +178,7 @@ ggplot(data3, aes(x=P_treatment, y=mean.max.canopy.ht.aop,group=statN))+
 
 
 ### Different graphics##################################################################
-data1=data3
+data1=lid
 colnames(data1)
 For_N <-data1 %>% select(Years, 
                            Age,

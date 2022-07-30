@@ -19,6 +19,9 @@ head(lid)
 lid$N_treatment<-factor(lid$N_treatment,levels=c("Without_N","With_N"))
 lid$Pgroup<-paste(lid$P_treatment, lid$Stand, lid$Year)
 
+lid$P_treatment<-factor(lid$P_treatment,levels=c("Without_P","With_P"))
+lid$Ngroup<-paste(lid$N_treatment, lid$Stand, lid$Year)
+
 table(lid$Treatment)
 
 lid$Treatment<-factor(lid$Treatment, levels=c("Control","N","P","NP"))
@@ -26,14 +29,14 @@ lid$Treatment<-factor(lid$Treatment, levels=c("Control","N","P","NP"))
 head(lid)
 lid$Years<-as.factor(lid$Years)
 
-ggplot(lid, aes(x=N_treatment, y=mean.max.canopy.ht.aop, shape=Years, group=Pgroup))+geom_point(aes(col=Treatment))+geom_line()+
+ggplot(lid, aes(x=N_treatment, y=mean.max.canopy.ht.aop, shape=Years, group=Pgroup))+geom_point(aes(col=Treatment), size=5)+geom_line()+
   facet_wrap(~Stand, scales="free_y")+scale_color_manual(values=c("black","blue","red","purple"))+
   ylab("mean max tree height (m)")+theme_classic()
 
 
-ggplot(lid, aes(x=N_treatment, y= rumple.aop  , shape=Years, group=Pgroup))+geom_point(aes(col=Treatment))+geom_line()+
+ggplot(lid, aes(x=P_treatment, y= rumple.aop  , shape=Years, group=Ngroup))+geom_point(aes(col=Treatment),size=5)+geom_line()+
   facet_wrap(~Stand, scales="free_y")+scale_color_manual(values=c("black","blue","red","purple"))+
-  ylab("mean max tree height (m)")+theme_classic()
+  ylab("rumple")+theme_classic()
 
 o1 <- anova( lme( rumple.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
 

@@ -53,16 +53,16 @@ names(lid)
 
 
 # essentially, you are going through each column 6:18 and generating this output
-<<<<<<< HEAD
+
 library(emmeans)
 m1 <- ( lme( mean.max.canopy.ht.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=lid))
 anova(m1)
-=======
+
 
 
 m1 <- anova(( lme( mean.max.canopy.ht.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3)))
 m1
->>>>>>> 62261e521cb68a0815324fc81377cd7d615bf068
+
 a1 <- emmeans(m1, pairwise ~ N_treatment+P_treatment)
 a11 <- emmeans(m1, pairwise ~ Age+Year)
 a1
@@ -75,12 +75,11 @@ b11
 o1 <- ( lme( rumple.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=lid))
 c1 <- emmeans(o1, pairwise ~ N_treatment+P_treatment)
 c1
-<<<<<<< HEAD
+
 p1 <- ( lme( sd.sd.aop.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=lid))
-=======
+
 p1 <- ( lme( sd.sd.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=data3))
 
->>>>>>> 62261e521cb68a0815324fc81377cd7d615bf068
 d1 <- emmeans(p1, pairwise ~ N_treatment+P_treatment)
 d1
 q1 <- ( lme(VAI.AOP.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, data=lid))
@@ -90,14 +89,13 @@ r1 <- ( lme(VCI.AOP.aop ~ N_treatment*P_treatment+Year+Age, random=~1|Stand, dat
 g1 <- emmeans(r1, pairwise ~ N_treatment+P_treatment)
 g1
 
-<<<<<<< HEAD
+
 for(i in c(6:18)){ 
   y = lid[,i]
   Stand= lid$Stand
   N_treatment=lid$N_treatment
   P_treatment=lid$P_treatment
-  output.mixed[[i-5]] <- aov.mixed(y, Stand, N_treatment, P_treatment, Year, Age)}
-=======
+  output.mixed[[i-5]] <- aov.mixed(y, Stand, N_treatment, P_treatment, Year, Age)
 
 rbind(m1,n1,o1, p1, q1, r1)
 
@@ -114,9 +112,6 @@ for(i in c(8:21)){
   N_treatment=data3$N_treatment
   P_treatment=data3$P_treatment
   output.mixed[[i-7]] <- aov.mixed(y, Stand, N_treatment, P_treatment, Year, Age)}
-
-
->>>>>>> 62261e521cb68a0815324fc81377cd7d615bf068
 
 
 output.mixed
